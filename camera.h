@@ -13,6 +13,8 @@ class camera {
 public:
     double aspect_ratio_ideal = 16.0 / 9.0;
     int image_width = 400;
+    point3 pixel00_center;
+    vec3 pixel_delta_u, pixel_delta_v; // world unit pixel dimensions
 
     void render() {
 
@@ -38,12 +40,12 @@ private:
         vec3 viewport_v = vec3(0, -viewport_height, 0);
 
         // Pixel delta dimensions (world dimensions)
-        vec3 pixel_delta_u = viewport_u / image_width;
-        vec3 pixel_delta_v = viewport_v / image_height;
+        pixel_delta_u = viewport_u / image_width;
+        pixel_delta_v = viewport_v / image_height;
 
         // Upper-left coordinates (world dimensions)
         point3 viewport_top_left = camera_center + focal_vec - viewport_u/2 - viewport_v/2;
-        point3 pixel00_center = viewport_top_left + 0.5 * pixel_delta_u + 0.5 * pixel_delta_v;
+        pixel00_center = viewport_top_left + 0.5 * pixel_delta_u + 0.5 * pixel_delta_v;
     }
 
     color ray_color(const ray &r, const hittable &world) {
