@@ -55,6 +55,12 @@ build CMakeFiles/raytracer.dir/main.cpp.o: CXX_COMPILER__raytracer_unscanned_Deb
   OBJECT_DIR = CMakeFiles/raytracer.dir
   OBJECT_FILE_DIR = CMakeFiles/raytracer.dir
 
+build CMakeFiles/raytracer.dir/test_ppm.cpp.o: CXX_COMPILER__raytracer_unscanned_Debug /home/david/CLionProjects/raytracer/test_ppm.cpp || cmake_object_order_depends_target_raytracer
+  DEP_FILE = CMakeFiles/raytracer.dir/test_ppm.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles/raytracer.dir
+  OBJECT_FILE_DIR = CMakeFiles/raytracer.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target raytracer
@@ -63,7 +69,7 @@ build CMakeFiles/raytracer.dir/main.cpp.o: CXX_COMPILER__raytracer_unscanned_Deb
 #############################################
 # Link the executable raytracer
 
-build raytracer: CXX_EXECUTABLE_LINKER__raytracer_Debug CMakeFiles/raytracer.dir/main.cpp.o
+build raytracer: CXX_EXECUTABLE_LINKER__raytracer_Debug CMakeFiles/raytracer.dir/main.cpp.o CMakeFiles/raytracer.dir/test_ppm.cpp.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/raytracer.dir
   POST_BUILD = :
