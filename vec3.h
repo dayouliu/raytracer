@@ -50,6 +50,14 @@ public:
     double length_squared() const {
         return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
     }
+
+    static vec3 random() {
+        return vec3(random_double(), random_double(), random_double());
+    }
+
+    static vec3 random(double min, double max) {
+        return vec3(random_double(min,max), random_double(min,max), random_double(min,max));
+    }
 };
 
 // point3 is just an alias for vec3, but useful for geometric clarity in the code.
@@ -100,6 +108,40 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
 
 inline vec3 unit_vector(vec3 v) {
     return v / v.length();
+}
+
+void test(int p) {
+
+}
+
+// Uses the rejection method
+// statistically likely to pick a valid vector (unit sphere / unit cube)
+inline vec3 random_vec_in_unit_sphere() {
+    int b = 1;
+    const int *a = &b;
+    test(b);
+
+    while(true) {
+        vec3 v = vec3::random(-1, 1);
+        if(v.length_squared() < 1) return v;
+    }
+}
+
+// Picking a unit vector this way will lead to bias because the volume space is a cube,
+// there will be more bias towards the diagonals
+// https://towardsdatascience.com/the-best-way-to-pick-a-unit-vector-7bd0cc54f9b
+//inline vec3 random_unit_vec() {
+//    return unit_vector(vec3::random(-1, 1));
+//}
+
+inline vec3 random_unit_vec() {
+    return unit_vector(random_vec_in_unit_sphere());
+}
+
+inline vec3 random_unit_vec_on_hemisphere(const vec3& normal) {
+    vec3 v = random_unit_vec();
+    if(dot(normal, v) < 0) v *= -1; // not in same dir
+    return v;
 }
 
 #endif //RAYTRACER_VEC3_H
