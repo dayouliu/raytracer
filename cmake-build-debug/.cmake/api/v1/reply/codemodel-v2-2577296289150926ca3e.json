@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "raytracer::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-raytracer-Debug-e0cd7a3b2668b4e92eb2.json",
+					"jsonFile" : "target-raytracer-Debug-cd4d7ada9c80b850082a.json",
 					"name" : "raytracer",
 					"projectIndex" : 0
 				}
@@ -49,12 +49,12 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/home/david/CLionProjects/raytracer/cmake-build-debug",
-		"source" : "/home/david/CLionProjects/raytracer"
+		"build" : "/Users/dayou/dev/raytracer/cmake-build-debug",
+		"source" : "/Users/dayou/dev/raytracer"
 	},
 	"version" : 
 	{
 		"major" : 2,
-		"minor" : 5
+		"minor" : 6
 	}
 }
