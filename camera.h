@@ -16,8 +16,9 @@ class camera {
 public:
     double aspect_ratio_ideal = 16.0 / 9.0;
     int image_width = 400;
-    int samples_per_pixel = 10;
+    int samples_per_pixel = 100;
     bool antialiasing = true; // considers colors of multiple rays per pixel
+    int max_render_depth = 50; // limits number of light ray bounces
 
     void render(hittable &world) {
         init();
@@ -68,8 +69,13 @@ private:
         pixel00_center = viewport_top_left + 0.5 * pixel_delta_u + 0.5 * pixel_delta_v;
     }
 
-    color ray_color(const ray &r, const hittable &world) {
+    color ray_color(const ray &r, const hittable &world, uint depth) {
         hit_record record;
+
+        // if ray bounces for too long, we approximate by returning no light
+        if(depth >= max_render_depth) {
+            return color(0,0,0);
+        }
 
         // sphere normal gradient
 //        if(world.hit(r, interval(0, INF), record)) {
@@ -77,13 +83,17 @@ private:
 //            return normal_gradient;
 //        }
 
-        // diffuse material
-        if(world.hit(r, interval(0, INF), record)) {
+        // Random diffuse material
+        // Light ray is scattered randomly across surface
+        // Interval starts at 0.001 to prevent shadow acne.
+        // Calculated intersection may be slightly off and bounced ray may be just below the surface,
+        // causing the next ray to intersect the surface (and have a very small t value for the intersection)
+        if(world.hit(r, interval(0.001, INF), record)) {
             vec3 dir = random_unit_vec_on_hemisphere(record.normal);
 
             // ray bounces until it hits background color
             // more bounces, color value gets smaller, color becomes darker
-            return 0.5 * ray_color(ray(record.point, dir), world);
+            return 0.5 * ray_color(ray(record.point, dir), world, depth+1);
         }
 
         // blue sky gradient background
@@ -98,16 +108,19 @@ private:
         point3 pixel_center = pixel00_center + c*pixel_delta_u + r*pixel_delta_v;
         vec3 ray_dir = pixel_center - camera_center; // goes from camera to pixel
         ray ry(camera_center, ray_dir);
-        color pixel_color = ray_color(ry, world);
+        color pixel_color = ray_color(ry, world, 0);
         write_color(std::cout, pixel_color);
     }
 
+    // Antiliasing samples colors from surrounding pixels as well.
+    // Motivation: pixels for faraway checkerboard will appear grey instead of
+    // black and/or white, mimicking our eyes
     void render_color_antialias(int r, int c, hittable &world) {
         point3 pixel_center = pixel00_center + c*pixel_delta_u + r*pixel_delta_v;
         color pixel_color = color(0, 0, 0);
         for(int i = 0; i < samples_per_pixel; ++i) {
             const ray sample = sample_ray(pixel_center);
-            color sample_color = ray_color(sample, world);
+            color sample_color = ray_color(sample, world, 0);
             pixel_color += sample_color;
         }
         write_color_antialias(std::cout, pixel_color, samples_per_pixel);
