@@ -19,6 +19,7 @@ public:
     int samples_per_pixel = 100;
     bool antialiasing = true; // considers colors of multiple rays per pixel
     int max_render_depth = 50; // limits number of light ray bounces
+    bool
 
     void render(hittable &world) {
         init();
@@ -83,12 +84,17 @@ private:
 //            return normal_gradient;
 //        }
 
-        // Random diffuse material
+        // Diffuse material
         // Light ray is scattered randomly across surface
         // Interval starts at 0.001 to prevent shadow acne.
         // Calculated intersection may be slightly off and bounced ray may be just below the surface,
         // causing the next ray to intersect the surface (and have a very small t value for the intersection)
         if(world.hit(r, interval(0.001, INF), record)) {
+            // Random diffuse reflection
+            // vec3 dir = random_unit_vec_on_hemisphere(record.normal);
+
+            // Lambertian Reflection
+            // More realistically models the real world. Reflected rays biased towards normal.
             vec3 dir = random_unit_vec_on_hemisphere(record.normal);
 
             // ray bounces until it hits background color
