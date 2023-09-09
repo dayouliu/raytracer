@@ -21,15 +21,15 @@ public:
                          const = 0;
 };
 
-//class normal_gradient : public material {
-//    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-//    const override {
-//        // Convert normal into a color
-//        color normal_gradient = 0.5 * (rec.normal + color(1, 1, 1));
-//        attenuation = normal_gradient;
-//        return true;
-//    }
-//};
+class normal_gradient : public material {
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
+    const override {
+        // Convert normal into a color
+        color normal_gradient = 0.5 * (rec.normal + color(1, 1, 1));
+        attenuation = normal_gradient;
+        return false;
+    }
+};
 
 class random_diffuse : public material {
 public:

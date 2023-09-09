@@ -88,8 +88,9 @@ private:
                 // More bounces, color value gets smaller, color becomes darker
                 return attenuation * ray_color(scattered, world, depth+1);
             }
-            // Material absorbed all light
-            return color(0,0,0);
+            // Material omits light directly
+            return attenuation;
+//            return color(0,0,0);
         }
 
         // blue sky gradient background
