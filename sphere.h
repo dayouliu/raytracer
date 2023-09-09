@@ -7,9 +7,11 @@
 
 #include "hittable.h"
 
+// Keep track of a contact point between a (light) rays 
 class sphere: public hittable {
 public:
-    sphere(point3 center, double radius) : center(center), radius(radius) {}
+    sphere(point3 center, double radius, shared_ptr<material> mat)
+        : center(center), radius(radius), mat(mat) {}
 
     // Detect if a ray will intersect a sphere
     // vector equation of ray: P(t) = O + dt
@@ -20,7 +22,7 @@ public:
     // negative = no roots => no intersection
     // 0 or positive = at least 1 root => intersection
     // we return t, if t < 0 => no intersection (or intersection is at back of camera)
-    bool hit(const ray &r, interval ray_t, hit_record &record) const override {
+    bool hit(const ray &r, interval ray_t, hit_record &rec) const override {
         point3 O = r.origin();
         vec3 d = r.direction();
         vec3 oc = O - center;
@@ -42,16 +44,18 @@ public:
             if(!ray_t.surrounds(root)) return false;
         }
 
-        record.t = root;
-        record.point = r.at(root);
-        vec3 outward_normal = (record.point - center) / radius; // as a unit vector
-        record.set_face_normal(r, outward_normal);
+        rec.t = root;
+        rec.point = r.at(root);
+        vec3 outward_normal = (rec.point - center) / radius; // as a unit vector
+        rec.set_face_normal(r, outward_normal);
+        rec.mat = mat;
         return true;
     }
 
 private:
     point3 center;
     double radius;
+    shared_ptr<material> mat;
 };
 
 #endif //RAYTRACER_SPHERE_H

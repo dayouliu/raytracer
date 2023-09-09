@@ -8,6 +8,7 @@
 #include "rtmath.h"
 #include "color.h"
 #include "hittable.h"
+#include "material.h"
 
 // In the real world, light comes to the camera.
 // In our simulation, our rays trace backwards from camera to world.
@@ -19,7 +20,6 @@ public:
     int samples_per_pixel = 100;
     bool antialiasing = true; // considers colors of multiple rays per pixel
     int max_render_depth = 50; // limits number of light ray bounces
-    bool
 
     void render(hittable &world) {
         init();
@@ -71,35 +71,25 @@ private:
     }
 
     color ray_color(const ray &r, const hittable &world, uint depth) {
-        hit_record record;
-
         // if ray bounces for too long, we approximate by returning no light
         if(depth >= max_render_depth) {
             return color(0,0,0);
         }
 
-        // sphere normal gradient
-//        if(world.hit(r, interval(0, INF), record)) {
-//            auto normal_gradient = 0.5 * (record.normal + color(1, 1, 1));
-//            return normal_gradient;
-//        }
-
-        // Diffuse material
-        // Light ray is scattered randomly across surface
         // Interval starts at 0.001 to prevent shadow acne.
         // Calculated intersection may be slightly off and bounced ray may be just below the surface,
         // causing the next ray to intersect the surface (and have a very small t value for the intersection)
+        hit_record record;
         if(world.hit(r, interval(0.001, INF), record)) {
-            // Random diffuse reflection
-            // vec3 dir = random_unit_vec_on_hemisphere(record.normal);
-
-            // Lambertian Reflection
-            // More realistically models the real world. Reflected rays biased towards normal.
-            vec3 dir = random_unit_vec_on_hemisphere(record.normal);
-
-            // ray bounces until it hits background color
-            // more bounces, color value gets smaller, color becomes darker
-            return 0.5 * ray_color(ray(record.point, dir), world, depth+1);
+            color attenuation;
+            ray scattered;
+            if(record.mat->scatter(r, record, attenuation, scattered)) {
+                // Ray bounces until it hits background color
+                // More bounces, color value gets smaller, color becomes darker
+                return attenuation * ray_color(scattered, world, depth+1);
+            }
+            // Material absorbed all light
+            return color(0,0,0);
         }
 
         // blue sky gradient background

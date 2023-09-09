@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <iostream>
+#include "rtmath.h"
 
 using std::sqrt;
 
@@ -57,6 +58,11 @@ public:
 
     static vec3 random(double min, double max) {
         return vec3(random_double(min,max), random_double(min,max), random_double(min,max));
+    }
+
+    bool near_zero() const {
+        double s = 1e-8;
+        return (abs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
     }
 };
 
@@ -138,11 +144,20 @@ inline vec3 random_unit_vec() {
     return unit_vector(random_vec_in_unit_sphere());
 }
 
-inline vec3 random_unit_vec_on_hemisphere(const vec3& normal) {
+inline vec3 random_unit_vec_on_hemisphere(const vec3 &normal) {
     vec3 v = random_unit_vec();
     if(dot(normal, v) < 0) v *= -1; // not in same dir
     return v;
 }
+
+// Recall dot product is magnitude of the projection of v on normal scaled by |n| (v dot n = |n| * |v| cos theta
+// where theta is the angle between n and v.
+// Noted that n is normalized and a unit vector, so v dot n = |v| cos theta = b.
+// Geometrically, v - 2b will give us the reflected vector.
+inline vec3 reflect(const vec3 &v, const vec3 &normal) {
+    return v - 2 * dot(v, normal) * normal; // normal must be a unit vector
+}
+
 
 #endif //RAYTRACER_VEC3_H
 

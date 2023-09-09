@@ -9,10 +9,13 @@
 #include <memory>
 #include <vector>
 
+class material;
+
 class hit_record {
 public:
     point3 point; // hit contact point
     vec3 normal; // as a unit vector
+    shared_ptr<material> mat;
     double t; // ray(t) = A + bt
     bool front_face; // if ray is hitting the outward face of object
 
