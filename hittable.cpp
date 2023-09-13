@@ -11,6 +11,9 @@ void hit_record::set_face_normal(const ray &r, const vec3 &outward_normal) {
     normal = front_face ? outward_normal : -outward_normal;
 }
 
+hittable_list::hittable_list() {}
+
+
 hittable_list::hittable_list(std::shared_ptr<hittable> obj) {
     hittable_list::add(obj);
 }
@@ -23,7 +26,7 @@ void hittable_list::add(std::shared_ptr<hittable> obj) {
     objs.push_back(obj);
 }
 
-bool hittable_list::hit(const ray& r, interval ray_t, hit_record& rec) const override {
+bool hittable_list::hit(const ray& r, interval ray_t, hit_record& rec) const {
     hit_record temp_record;
     bool hit_anything = false;
     double closest_so_far = ray_t.max;

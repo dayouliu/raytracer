@@ -11,41 +11,18 @@ public:
     // Allows for child destructor to be called for
     virtual ~material() = default;
 
-    virtual bool scatter(const ray& r_in, const hit_record &rec,
-                         color &attenuation, ray &scattered)
-                         const = 0;
+    virtual bool scatter(const ray& r_in, const hit_record &rec, color &attenuation, ray &scattered) const = 0;
 };
 
 class normal_gradient : public material {
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-    const override {
-        // Convert normal into a color
-        color normal_gradient = 0.5 * (rec.normal + color(1, 1, 1));
-        attenuation = normal_gradient;
-        return false;
-    }
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override;
 };
 
 class random_diffuse : public material {
 public:
-    random_diffuse(const color &alb) : albedo(alb) {}
+    random_diffuse(const color &alb);
 
-    bool scatter(const ray& r_in, const hit_record &rec,
-                 color &attenuation, ray &scattered)
-    const override {
-        // Simple diffuse material
-        // Light ray is scattered randomly across surface
-        vec3 scatter_dir = rec.normal;
-
-        // Catch degenerate scatter direction
-        // Zero vector direction can result in NaN calculations later on
-        if (scatter_dir.near_zero())
-            scatter_dir = rec.normal;
-
-        scattered = ray(rec.point, scatter_dir);
-        attenuation = albedo;
-        return true; // Always scatter and attenuate instead of probability of being absorbed
-    }
+    bool scatter(const ray& r_in, const hit_record &rec, color &attenuation, ray &scattered) const override;
 
 private:
     color albedo;
@@ -53,24 +30,9 @@ private:
 
 class lambertian : public material {
 public:
-    lambertian(const color &alb) : albedo(alb) {}
+    lambertian(const color &alb);
 
-    bool scatter(const ray& r_in, const hit_record &rec,
-                 color &attenuation, ray &scattered)
-                 const override {
-        // Lambertian Reflection
-        // More realistically models the real world. Reflected rays biased towards normal.
-        vec3 scatter_dir = rec.normal + random_unit_vec();
-
-        // Catch degenerate scatter direction
-        // Zero vector direction can result in NaN calculations later on
-        if (scatter_dir.near_zero())
-            scatter_dir = rec.normal;
-
-        scattered = ray(rec.point, scatter_dir);
-        attenuation = albedo;
-        return true; // Always scatter and attenuate instead of probability of being absorbed
-    }
+    bool scatter(const ray& r_in, const hit_record &rec, color &attenuation, ray &scattered) const override;
 
 private:
     color albedo;
@@ -78,15 +40,9 @@ private:
 
 class metal : public material {
 public:
-    metal(const color& a) : albedo(a) {}
+    metal(const color& a);
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-    const override {
-        vec3 reflected = reflect(r_in.direction(), rec.normal);
-        scattered = ray(rec.point, unit_vector(reflected));
-        attenuation = albedo;
-        return true;
-    }
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override;
 
 private:
     color albedo;

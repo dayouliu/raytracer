@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+using namespace std;
+
 int main() {
     // World objects
     hittable_list world;

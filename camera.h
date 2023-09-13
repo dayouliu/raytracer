@@ -2,8 +2,7 @@
 // Created by david on 9/4/23.
 //
 
-#ifndef RAYTRACER_CAMERA_H
-#define RAYTRACER_CAMERA_H
+#pragma once
 
 #include "rtmath.h"
 #include "color.h"
@@ -21,21 +20,7 @@ public:
     bool antialiasing = true; // considers colors of multiple rays per pixel
     int max_render_depth = 50; // limits number of light ray bounces
 
-    void render(hittable &world) {
-        init();
-
-        std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-        for (int r = 0; r < image_height; ++r) {
-            for (int c = 0; c < image_width; ++c) {
-                if(antialiasing) {
-                    render_color_antialias(r, c, world);
-                } else {
-                    render_color(r, c, world);
-                }
-            }
-        }
-        std::clog << "\rDone.                 \n";
-    }
+    void render(hittable &world);
 
 private:
     int image_height;
@@ -43,99 +28,19 @@ private:
     vec3 pixel_delta_u, pixel_delta_v; // world unit pixel dimensions
     point3 camera_center;
 
-    void init() {
-        // Image dimensions in pixels (pixel dimensions)
-        image_height = std::max(1, static_cast<int>(image_width / aspect_ratio_ideal));
-        double aspect_ratio_actual = static_cast<double>(image_width) / image_height;
+    void init();
 
-        // Camera/viewport dimensions (world dimensions)
-        // Uses actual world coordinate dimensions
-        double viewport_height = 2.0;
-        double viewport_width = viewport_height * aspect_ratio_actual;
-        double focal_length = 1.0;
-        vec3 focal_vec = vec3(0, 0, -focal_length);
-        camera_center = point3(0, 0, 0);
+    color ray_color(const ray &r, const hittable &world, uint depth);
 
-        // Viewport dimensions (world dimensions)
-        // u in x dimension, v in the y dimension
-        vec3 viewport_u = vec3(viewport_width, 0, 0);
-        vec3 viewport_v = vec3(0, -viewport_height, 0);
-
-        // Pixel delta dimensions (world dimensions)
-        pixel_delta_u = viewport_u / image_width;
-        pixel_delta_v = viewport_v / image_height;
-
-        // Upper-left coordinates (world dimensions)
-        point3 viewport_top_left = camera_center + focal_vec - viewport_u/2 - viewport_v/2;
-        pixel00_center = viewport_top_left + 0.5 * pixel_delta_u + 0.5 * pixel_delta_v;
-    }
-
-    color ray_color(const ray &r, const hittable &world, uint depth) {
-        // if ray bounces for too long, we approximate by returning no light
-        if(depth >= max_render_depth) {
-            return color(0,0,0);
-        }
-
-        // Interval starts at 0.001 to prevent shadow acne.
-        // Calculated intersection may be slightly off and bounced ray may be just below the surface,
-        // causing the next ray to intersect the surface (and have a very small t value for the intersection)
-        hit_record record;
-        if(world.hit(r, interval(0.001, INF), record)) {
-            color attenuation;
-            ray scattered;
-            if(record.mat->scatter(r, record, attenuation, scattered)) {
-                // Ray bounces until it hits background color
-                // More bounces, color value gets smaller, color becomes darker
-                return attenuation * ray_color(scattered, world, depth+1);
-            }
-            // Material omits light directly
-            return attenuation;
-//            return color(0,0,0);
-        }
-
-        // blue sky gradient background
-        vec3 unit_dir = unit_vector(r.direction());
-        double a = 0.5 * (unit_dir.y() + 1.0); // unit_ray_vec.y transform to [0, 1]
-        vec3 white = color(1.0, 1.0, 1.0);
-        vec3 blue = color(0.5, 0.7, 1.0);
-        return (1.0 - a) * white + a * blue;
-    }
-
-    void render_color(int r, int c, hittable &world) {
-        point3 pixel_center = pixel00_center + c*pixel_delta_u + r*pixel_delta_v;
-        vec3 ray_dir = pixel_center - camera_center; // goes from camera to pixel
-        ray ry(camera_center, ray_dir);
-        color pixel_color = ray_color(ry, world, 0);
-        write_color(std::cout, pixel_color);
-    }
+    void render_color(int r, int c, hittable &world);
 
     // Antiliasing samples colors from surrounding pixels as well.
     // Motivation: pixels for faraway checkerboard will appear grey instead of
     // black and/or white, mimicking our eyes
-    void render_color_antialias(int r, int c, hittable &world) {
-        point3 pixel_center = pixel00_center + c*pixel_delta_u + r*pixel_delta_v;
-        color pixel_color = color(0, 0, 0);
-        for(int i = 0; i < samples_per_pixel; ++i) {
-            const ray sample = sample_ray(pixel_center);
-            color sample_color = ray_color(sample, world, 0);
-            pixel_color += sample_color;
-        }
-        write_color_antialias(std::cout, pixel_color, samples_per_pixel);
-    }
+    void render_color_antialias(int r, int c, hittable &world);
 
-    ray sample_ray(point3 pixel_center) {
-        point3 sampled_pixel = sample_pixel_square(pixel_center);
-
-        vec3 dir = sampled_pixel - camera_center;
-        return ray(camera_center, dir);
-    }
+    ray sample_ray(point3 pixel_center);
 
     // randomly samples closest nearby pixels
-    point3 sample_pixel_square(point3 pixel_center) {
-        double dr = random_double(-0.5, 0.5);
-        double dc = random_double(-0.5, 0.5);
-        return pixel_center + dr*pixel_delta_v + dc*pixel_delta_u;
-    }
+    point3 sample_pixel_square(point3 pixel_center);
 };
-
-#endif //RAYTRACER_CAMERA_H

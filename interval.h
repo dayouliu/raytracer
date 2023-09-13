@@ -5,9 +5,9 @@
 class interval {
 public:
     double min, max;
-    interval() : min(+INF), max(-INF) {} // Default interval is empty
+    interval();
 
-    interval(double _min, double _max) : min(_min), max(_max) {}
+    interval(double _min, double _max);
 
     bool contains(double x) const;
 

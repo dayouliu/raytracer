@@ -17,4 +17,10 @@ add_executable(raytracer main.cpp
         color.cpp
         hittable.cpp
         interval.cpp
+        material.cpp
+        ray.cpp
+        rtmath.cpp
+        sphere.cpp
+        vec3.cpp
+        camera.cpp
 )

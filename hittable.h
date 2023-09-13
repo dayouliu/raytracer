@@ -1,8 +1,9 @@
 #pragma once
 
-#include "ray.h"
 #include <memory>
 #include <vector>
+#include "ray.h"
+#include "interval.h"
 
 class material;
 
@@ -10,7 +11,7 @@ class hit_record {
 public:
     point3 point; // hit contact point
     vec3 normal; // as a unit vector
-    shared_ptr<material> mat;
+    std::shared_ptr<material> mat;
     double t; // ray(t) = A + bt
     bool front_face; // if ray is hitting the outward face of object
 
@@ -29,6 +30,8 @@ public:
 class hittable_list : public hittable {
 public:
     std::vector<std::shared_ptr<hittable>> objs;
+
+    hittable_list();
 
     hittable_list(std::shared_ptr<hittable> obj);
 

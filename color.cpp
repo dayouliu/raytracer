@@ -1,4 +1,5 @@
 #include "color.h"
+#include "interval.h"
 
 inline double linear_to_gamma(double linear) {
     return std::sqrt(linear);
