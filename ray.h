@@ -1,9 +1,4 @@
-//
-// Created by david on 8/26/23.
-//
-
-#ifndef RAYTRACER_RAY_H
-#define RAYTRACER_RAY_H
+#pragma once
 
 #include "vec3.h"
 
@@ -24,5 +19,3 @@ private:
     point3 orig;
     vec3 dir;
 };
-
-#endif //RAYTRACER_RAY_H

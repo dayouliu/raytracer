@@ -1,9 +1,4 @@
-//
-// Created by david on 8/26/23.
-//
-
-#ifndef RAYTRACER_VEC3_H
-#define RAYTRACER_VEC3_H
+#pragma once
 
 #include <cmath>
 #include <iostream>
@@ -68,7 +63,6 @@ public:
 
 // point3 is just an alias for vec3, but useful for geometric clarity in the code.
 using point3 = vec3;
-
 
 // Vector Utility Functions
 
@@ -157,7 +151,4 @@ inline vec3 random_unit_vec_on_hemisphere(const vec3 &normal) {
 inline vec3 reflect(const vec3 &v, const vec3 &normal) {
     return v - 2 * dot(v, normal) * normal; // normal must be a unit vector
 }
-
-
-#endif //RAYTRACER_VEC3_H
 

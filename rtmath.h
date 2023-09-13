@@ -1,11 +1,5 @@
-//
-// Created by david on 9/3/23.
-//
+#pragma once
 
-#ifndef RAYTRACER_RTMATH_H
-#define RAYTRACER_RTMATH_H
-
-// Common headers
 #include <cmath>
 #include <limits>
 #include <memory>
@@ -30,9 +24,3 @@ double random_double(double min, double max) {
 inline double deg_to_rad(double degrees) {
     return degrees * PI / 180.0;
 }
-
-#include "interval.h"
-#include "ray.h"
-#include "vec3.h"
-
-#endif //RAYTRACER_RTMATH_H

@@ -1,9 +1,4 @@
-//
-// Created by david on 9/3/23.
-//
-
-#ifndef RAYTRACER_SPHERE_H
-#define RAYTRACER_SPHERE_H
+#pragma once
 
 #include "hittable.h"
 
@@ -57,5 +52,3 @@ private:
     double radius;
     shared_ptr<material> mat;
 };
-
-#endif //RAYTRACER_SPHERE_H

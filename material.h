@@ -1,9 +1,4 @@
-//
-// Created by david on 9/8/23.
-//
-
-#ifndef RAYTRACER_MATERIAL_H
-#define RAYTRACER_MATERIAL_H
+#pragma once
 
 #include "rtmath.h"
 #include "hittable.h"
@@ -96,5 +91,3 @@ public:
 private:
     color albedo;
 };
-
-#endif //RAYTRACER_MATERIAL_H

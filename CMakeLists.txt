@@ -14,4 +14,7 @@ add_executable(raytracer main.cpp
         camera.h
         test_ppm.cpp
         material.h
+        color.cpp
+        hittable.cpp
+        interval.cpp
 )
