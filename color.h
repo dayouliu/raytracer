@@ -5,7 +5,9 @@
 
 using color = vec3;
 
-inline double linear_to_gamma(double linear);
+inline double linear_to_gamma(double linear) {
+    return std::sqrt(linear);
+}
 
 void write_color(std::ostream &out, color pixel_color);
 

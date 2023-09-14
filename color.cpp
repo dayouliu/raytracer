@@ -1,10 +1,6 @@
 #include "color.h"
 #include "interval.h"
 
-inline double linear_to_gamma(double linear) {
-    return std::sqrt(linear);
-}
-
 void write_color(std::ostream &out, color pixel_color) {
     // Write the translated [0,255] value of each color component [0, 1].
     out << static_cast<int>(255.999 * pixel_color.x()) << ' '

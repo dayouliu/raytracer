@@ -1,10 +1,7 @@
 #include "rtmath.h"
-#include "color.h"
 #include "hittable.h"
 #include "sphere.h"
 #include "camera.h"
-
-#include <iostream>
 
 using namespace std;
 
@@ -24,5 +21,5 @@ int main() {
     world.add(make_shared<sphere>(point3( 1.0,    0.0, -1.0),   0.5, material_gradient));
 
     camera cam;
-    cam.render(world);
+    cam.render_multithread(world);
 }

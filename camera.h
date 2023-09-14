@@ -20,7 +20,11 @@ public:
     bool antialiasing = true; // considers colors of multiple rays per pixel
     int max_render_depth = 50; // limits number of light ray bounces
 
+    int num_threads = 8; // Rendering threads
+    std::string image_filename = "image.ppm";
+
     void render(hittable &world);
+    void render_multithread(hittable &world);
 
 private:
     int image_height;
@@ -32,12 +36,12 @@ private:
 
     color ray_color(const ray &r, const hittable &world, uint depth);
 
-    void render_color(int r, int c, hittable &world);
+    color render_color(int r, int c, const hittable &world);
 
     // Antiliasing samples colors from surrounding pixels as well.
     // Motivation: pixels for faraway checkerboard will appear grey instead of
     // black and/or white, mimicking our eyes
-    void render_color_antialias(int r, int c, hittable &world);
+    color render_color_antialias(int r, int c, const hittable &world);
 
     ray sample_ray(point3 pixel_center);
 

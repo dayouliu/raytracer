@@ -1,18 +1,72 @@
 #include "camera.h"
+#include <thread>
+#include <iostream>
+#include <fstream>
+#include <cassert>
+
+using namespace std;
 
 void camera::render(hittable &world) {
+    std::clog << "\rStarting.                 \n";
     init();
 
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
     for (int r = 0; r < image_height; ++r) {
         for (int c = 0; c < image_width; ++c) {
             if(antialiasing) {
-                render_color_antialias(r, c, world);
+                write_color_antialias(std::cout, render_color_antialias(r, c, world), samples_per_pixel);
             } else {
-                render_color(r, c, world);
+                write_color(std::cout, render_color(r, c, world));
             }
         }
     }
+    std::clog << "\rDone.                 \n";
+}
+
+void camera::render_multithread(hittable &world) {
+    std::clog << "\rStarting.                 \n";
+    init();
+
+    int batch_size = image_height / num_threads;
+    int batches = (image_height + batch_size - 1) / batch_size;
+
+    vector<vector<color>> pixels(image_height, vector<color>(image_width));
+    vector<thread> threads;
+
+    for (int i = 0; i < batches; ++i) {
+        thread t([this, &world, &pixels](int batch, int batch_size) {
+            int r_start = batch * batch_size;
+            int r_end = min(r_start + batch_size, image_height);
+            for (int r = r_start; r < r_end; ++r) {
+                for(int c = 0; c < image_width; ++c) {
+                    pixels[r][c] = render_color_antialias(r, c, world);
+                }
+            }
+        }, i, batch_size);
+        threads.push_back(move(t));
+    }
+
+    for(auto &t : threads) {
+        t.join();
+    }
+
+    // Write to file
+
+    ofstream output_file(image_filename);
+    output_file << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+    assert(output_file.is_open());
+
+    for (int r = 0; r < image_height; ++r) {
+        for (int c = 0; c < image_width; ++c) {
+            if(antialiasing) {
+                write_color_antialias(output_file, pixels[r][c], samples_per_pixel);
+            } else {
+                write_color(output_file, pixels[r][c]);
+            }
+        }
+    }
+    output_file.close();
+
     std::clog << "\rDone.                 \n";
 }
 
@@ -74,18 +128,14 @@ color camera::ray_color(const ray &r, const hittable &world, uint depth) {
     return (1.0 - a) * white + a * blue;
 }
 
-void camera::render_color(int r, int c, hittable &world) {
+color camera::render_color(int r, int c, const hittable &world) {
     point3 pixel_center = pixel00_center + c*pixel_delta_u + r*pixel_delta_v;
     vec3 ray_dir = pixel_center - camera_center; // goes from camera to pixel
     ray ry(camera_center, ray_dir);
-    color pixel_color = ray_color(ry, world, 0);
-    write_color(std::cout, pixel_color);
+    return ray_color(ry, world, 0);
 }
 
-// Antiliasing samples colors from surrounding pixels as well.
-// Motivation: pixels for faraway checkerboard will appear grey instead of
-// black and/or white, mimicking our eyes
-void camera::render_color_antialias(int r, int c, hittable &world) {
+color camera::render_color_antialias(int r, int c, const hittable &world) {
     point3 pixel_center = pixel00_center + c*pixel_delta_u + r*pixel_delta_v;
     color pixel_color = color(0, 0, 0);
     for(int i = 0; i < samples_per_pixel; ++i) {
@@ -93,7 +143,7 @@ void camera::render_color_antialias(int r, int c, hittable &world) {
         color sample_color = ray_color(sample, world, 0);
         pixel_color += sample_color;
     }
-    write_color_antialias(std::cout, pixel_color, samples_per_pixel);
+    return pixel_color;
 }
 
 ray camera::sample_ray(point3 pixel_center) {
@@ -103,7 +153,6 @@ ray camera::sample_ray(point3 pixel_center) {
     return ray(camera_center, dir);
 }
 
-// randomly samples closest nearby pixels
 point3 camera::sample_pixel_square(point3 pixel_center) {
     double dr = random_double(-0.5, 0.5);
     double dc = random_double(-0.5, 0.5);

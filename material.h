@@ -8,7 +8,7 @@ class hit_record;
 
 class material {
 public:
-    // Allows for child destructor to be called for
+    // Allows for child destructor to be called for polymorphism
     virtual ~material() = default;
 
     virtual bool scatter(const ray& r_in, const hit_record &rec, color &attenuation, ray &scattered) const = 0;

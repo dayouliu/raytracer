@@ -14,4 +14,6 @@ double random_double();
 // Basic pseudorandom double in range [min, max), not uniformly distributed
 double random_double(double min, double max);
 
-inline double deg_to_rad(double degrees);
+inline double deg_to_rad(double degrees) {
+    return degrees * PI / 180.0;
+}

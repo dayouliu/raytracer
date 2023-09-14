@@ -1,7 +1,7 @@
 #include "material.h"
 
 bool normal_gradient::scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const {
-    // Convert normal into a color
+    // Convert normal into a color [-1, 1] => [0, 1]
     color normal_gradient = 0.5 * (rec.normal + color(1, 1, 1));
     attenuation = normal_gradient;
     return false;
