@@ -1,7 +1,7 @@
-#include "rtmath.h"
-#include "hittable.h"
-#include "sphere.h"
-#include "camera.h"
+#include "src/rtmath.h"
+#include "src/hittable.h"
+#include "src/sphere.h"
+#include "src/camera.h"
 
 using namespace std;
 
